@@ -32,7 +32,7 @@ app.post('/analyze', upload.single('chart'), async (req, res) => {
     const base64Image = req.file.buffer.toString('base64');
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.6-flash',
       contents: [
         {
           inlineData: {
