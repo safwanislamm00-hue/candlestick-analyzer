@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candlestick Chart AI Analyzer</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #121212; color: #fff; text-align: center; }
+    .box { border: 2px dashed #444; padding: 30px; border-radius: 10px; background: #1e1e1e; }
+    input[type="file"] { margin: 15px 0; }
+    button { background: #007bff; color: #fff; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    button:hover { background: #0056b3; }
+    #result { margin-top: 25px; text-align: left; background: #252525; padding: 20px; border-radius: 8px; white-space: pre-wrap; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+  <h2>📊 AI Candlestick Chart Analyzer</h2>
+  <div class="box">
+    <input type="file" id="imageInput" accept="image/*">
+    <br>
+    <button onclick="uploadAndAnalyze()">Analyze Chart</button>
+  </div>
+
+  <div id="result">Upload an image and click analyze...</div>
+
+  <script>
+    async function uploadAndAnalyze() {
+      const fileInput = document.getElementById('imageInput');
+      const resultDiv = document.getElementById('result');
+
+      if (!fileInput.files[0]) {
+        alert('Please select an image first!');
+        return;
+      }
+
+      resultDiv.innerText = 'Analyzing chart with Gemini AI... Please wait...';
+
+      const formData = new FormData();
+      formData.append('chart', fileInput.files[0]);
+
+      try {
+        const res = await fetch('/analyze', { method: 'POST', body: formData });
+        const data = await res.json();
+        resultDiv.innerText = data.analysis || data.error;
+      } catch (err) {
+        resultDiv.innerText = 'Error connecting to server.';
+      }
+    }
+  </script>
+</body>
+</html>
