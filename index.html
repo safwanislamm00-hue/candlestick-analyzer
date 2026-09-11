@@ -3,28 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Candlestick Chart AI Analyzer</title>
+  <title>AI Candlestick Analyzer</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
-      background: radial-gradient(circle at 50% 10%, #1a1a3a 0%, #0d0d15 60%, #050508 100%);
+      background: #090514;
       color: #e0e0e0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
+      overflow-x: hidden;
+      position: relative;
     }
 
-    .container {
+    /* Animated Canvas Background */
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+    }
+
+    /* LOCK SCREEN (Yellow Theme) */
+    #lockScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(15, 12, 5, 0.95);
+      backdrop-filter: blur(15px);
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .lock-box {
+      background: rgba(255, 204, 0, 0.05);
+      border: 1px solid rgba(255, 204, 0, 0.3);
+      padding: 40px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+      max-width: 350px;
+      width: 90%;
+    }
+
+    .lock-box h2 {
+      color: #ffcc00;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    .lock-box input {
       width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ffcc00;
+      background: #1a1600;
+      color: #fff;
+      text-align: center;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .lock-box button {
+      background: #ffcc00;
+      color: #000;
+      font-weight: bold;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .lock-box button:hover { background: #e6b800; }
+
+    /* MAIN APP (Purple Theme) */
+    .container {
       max-width: 750px;
+      margin: 40px auto;
+      padding: 20px;
     }
 
     .header {
@@ -34,151 +96,160 @@
       margin-bottom: 30px;
     }
 
-    h2 {
-      font-size: 24px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      background: linear-gradient(90deg, #8a2be2, #00ffff);
+    h2.title {
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #b06ab3, #4568dc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .box {
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.3);
       padding: 35px 20px;
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(20, 10, 35, 0.6);
       backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      box-shadow: 0 8px 32px 0 rgba(112, 0, 255, 0.2);
       text-align: center;
-      transition: border 0.3s ease;
     }
 
-    .box:hover {
-      border-color: rgba(0, 255, 255, 0.3);
-    }
+    input[type="file"] { margin: 20px 0; color: #aaa; }
 
-    input[type="file"] {
-      margin: 20px 0;
-      color: #aaa;
-    }
-
-    button {
-      background: linear-gradient(135deg, #007bff, #6610f2);
+    .btn-main {
+      background: linear-gradient(135deg, #8a2be2, #4a00e0);
       color: #fff;
       border: none;
-      padding: 12px 26px;
+      padding: 12px 28px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 15px;
-      font-weight: 500;
-      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-      transition: all 0.3s ease;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+      transition: 0.3s;
     }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
-    }
+    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6); }
 
     .settings-btn {
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
-    .settings-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: none;
+    /* SIGNAL RESULT BOXES */
+    #signalBox {
+      display: none;
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 1px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
 
-    #result {
-      margin-top: 30px;
+    .signal-up { background: #00c853; color: #fff; box-shadow: 0 0 20px rgba(0, 200, 83, 0.4) !important; }
+    .signal-down { background: #ff1744; color: #fff; box-shadow: 0 0 20px rgba(255, 23, 68, 0.4) !important; }
+    .signal-skip { background: #ff9100; color: #000; box-shadow: 0 0 20px rgba(255, 145, 0, 0.4) !important; }
+
+    #detailsBox {
+      display: none;
+      margin-top: 15px;
       text-align: left;
-      background: rgba(20, 20, 35, 0.6);
+      background: rgba(20, 10, 35, 0.8);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(168, 85, 247, 0.2);
       padding: 25px;
       border-radius: 12px;
       white-space: pre-wrap;
       line-height: 1.7;
-      font-size: 15px;
       color: #d1d5db;
     }
 
-    /* Modal Styling */
+    /* Settings Modal */
     .modal {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
-      justify-content: center;
-      align-items: center;
+      justify-content: center; align-items: center;
       z-index: 100;
     }
 
     .modal-content {
-      background: #12121e;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #130a21;
+      border: 1px solid rgba(168, 85, 247, 0.4);
       padding: 30px;
       border-radius: 14px;
-      width: 90%;
-      max-width: 420px;
-      text-align: left;
+      width: 90%; max-width: 400px;
     }
 
     .modal-content input {
-      width: 100%;
-      padding: 12px;
-      margin: 15px 0;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: #09090f;
-      color: #fff;
-      box-sizing: border-box;
-      outline: none;
-    }
-
-    .modal-content input:focus {
-      border-color: #00ffff;
+      width: 100%; padding: 12px; margin: 15px 0;
+      border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #090514; color: #fff; outline: none;
     }
   </style>
 </head>
 <body>
 
+  <canvas id="bg-canvas"></canvas>
+
+  <div id="lockScreen">
+    <div class="lock-box">
+      <h2>🔒 System Locked</h2>
+      <input type="password" id="passInput" placeholder="Enter Access Code">
+      <button onclick="checkPassword()">UNLOCK</button>
+    </div>
+  </div>
+
   <div class="container">
     <div class="header">
-      <h2>📊 AI Candlestick Analyzer</h2>
+      <h2 class="title">📊 AI Candlestick Analyzer</h2>
       <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
     </div>
 
     <div class="box">
       <input type="file" id="imageInput" accept="image/*">
       <br>
-      <button onclick="uploadAndAnalyze()">Analyze Chart</button>
+      <button class="btn-main" onclick="uploadAndAnalyze()">Analyze Chart</button>
     </div>
 
-    <div id="result">Upload an image and click analyze...</div>
+    <div id="signalBox"></div>
+
+    <div id="detailsBox">Upload an image and click analyze...</div>
   </div>
 
-  <!-- Settings Modal -->
   <div id="settingsModal" class="modal">
     <div class="modal-content">
-      <h3 style="margin-bottom: 8px;">⚙️ API Key Settings</h3>
-      <p style="font-size: 13px; color: #888;">আপনার কাস্টম Gemini API Key সেট করুন।</p>
-      <input type="password" id="customApiKey" placeholder="Paste your Gemini API Key here">
+      <h3>⚙️ API Key Settings</h3>
+      <p style="font-size: 13px; color: #aaa; margin-top: 5px;">Set your custom Gemini API Key.</p>
+      <input type="password" id="customApiKey" placeholder="Paste Gemini API Key">
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
         <button class="settings-btn" onclick="closeSettings()">Cancel</button>
-        <button onclick="saveSettings()">Save Key</button>
+        <button class="btn-main" onclick="saveSettings()" style="padding: 8px 16px;">Save Key</button>
       </div>
     </div>
   </div>
 
   <script>
+    // 1. LOCK SYSTEM
+    function checkPassword() {
+      const pass = document.getElementById('passInput').value;
+      if (pass === 'lawlite50') {
+        document.getElementById('lockScreen').style.display = 'none';
+      } else {
+        alert('Wrong Password!');
+      }
+    }
+
+    // 2. SETTINGS MANAGEMENT
     document.addEventListener('DOMContentLoaded', () => {
       const savedKey = localStorage.getItem('user_gemini_api_key');
       if (savedKey) document.getElementById('customApiKey').value = savedKey;
@@ -191,17 +262,19 @@
       const key = document.getElementById('customApiKey').value.trim();
       if (key) {
         localStorage.setItem('user_gemini_api_key', key);
-        alert('API Key saved successfully!');
+        alert('API Key saved!');
       } else {
         localStorage.removeItem('user_gemini_api_key');
-        alert('Cleared custom API Key. Default key will be used.');
+        alert('Default API Key restored.');
       }
       closeSettings();
     }
 
+    // 3. CHART ANALYSIS & SIGNAL PARSING
     async function uploadAndAnalyze() {
       const fileInput = document.getElementById('imageInput');
-      const resultDiv = document.getElementById('result');
+      const signalBox = document.getElementById('signalBox');
+      const detailsBox = document.getElementById('detailsBox');
       const customApiKey = localStorage.getItem('user_gemini_api_key') || '';
 
       if (!fileInput.files[0]) {
@@ -209,7 +282,9 @@
         return;
       }
 
-      resultDiv.innerText = 'Analyzing chart with Gemini AI... Please wait...';
+      signalBox.style.display = 'none';
+      detailsBox.style.display = 'block';
+      detailsBox.innerText = 'Analyzing chart with Gemini AI... Please wait...';
 
       const formData = new FormData();
       formData.append('chart', fileInput.files[0]);
@@ -221,11 +296,86 @@
           body: formData
         });
         const data = await res.json();
-        resultDiv.innerText = data.analysis || data.error;
+        
+        if (data.error) {
+          detailsBox.innerText = data.error;
+          return;
+        }
+
+        const text = data.analysis;
+        
+        // Signal Detection Logic
+        let signal = 'SKIP';
+        let signalClass = 'signal-skip';
+
+        if (text.includes('RECOMMENDATION: UP') || text.includes('PREDICTION: UP')) {
+          signal = '🟢 NEXT CANDLE: UP';
+          signalClass = 'signal-up';
+        } else if (text.includes('RECOMMENDATION: DOWN') || text.includes('PREDICTION: DOWN')) {
+          signal = '🔴 NEXT CANDLE: DOWN';
+          signalClass = 'signal-down';
+        } else {
+          signal = '🟠 NEXT CANDLE: SKIP / UNCERTAIN';
+          signalClass = 'signal-skip';
+        }
+
+        // Show Signal Box
+        signalBox.className = '';
+        signalBox.classList.add(signalClass);
+        signalBox.innerText = signal;
+        signalBox.style.display = 'block';
+
+        // Show Details
+        detailsBox.innerText = text;
+
       } catch (err) {
-        resultDiv.innerText = 'Error connecting to server.';
+        detailsBox.innerText = 'Error connecting to server.';
       }
     }
+
+    // 4. ANIMATED SPACE BACKGROUND (PARTICLES)
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < 70; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2,
+        speedX: (Math.random() - 0.5) * 0.5,
+        speedY: (Math.random() - 0.5) * 0.8
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(168, 85, 247, 0.6)';
+
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+      });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
   </script>
 </body>
 </html>
