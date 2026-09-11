@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Candlestick Analyzer</title>
+  <title>AI Candlestick Analyzer Bangla</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -16,7 +16,7 @@
       position: relative;
     }
 
-    /* Animated Canvas Background */
+    /* Dynamic Particle Canvas */
     #bg-canvas {
       position: fixed;
       top: 0; left: 0;
@@ -97,7 +97,7 @@
     }
 
     h2.title {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 700;
       background: linear-gradient(90deg, #b06ab3, #4568dc);
       -webkit-background-clip: text;
@@ -146,16 +146,15 @@
       margin-top: 25px;
       padding: 20px;
       border-radius: 12px;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: bold;
       text-align: center;
       letter-spacing: 1px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
 
-    .signal-up { background: #00c853; color: #fff; box-shadow: 0 0 20px rgba(0, 200, 83, 0.4) !important; }
-    .signal-down { background: #ff1744; color: #fff; box-shadow: 0 0 20px rgba(255, 23, 68, 0.4) !important; }
-    .signal-skip { background: #ff9100; color: #000; box-shadow: 0 0 20px rgba(255, 145, 0, 0.4) !important; }
+    .signal-up { background: #00c853; color: #fff; box-shadow: 0 0 25px rgba(0, 200, 83, 0.5) !important; }
+    .signal-down { background: #ff1744; color: #fff; box-shadow: 0 0 25px rgba(255, 23, 68, 0.5) !important; }
+    .signal-skip { background: #ff9100; color: #000; box-shadow: 0 0 25px rgba(255, 145, 0, 0.5) !important; }
 
     #detailsBox {
       display: none;
@@ -167,8 +166,9 @@
       padding: 25px;
       border-radius: 12px;
       white-space: pre-wrap;
-      line-height: 1.7;
+      line-height: 1.8;
       color: #d1d5db;
+      font-size: 15px;
     }
 
     /* Settings Modal */
@@ -203,37 +203,37 @@
 
   <div id="lockScreen">
     <div class="lock-box">
-      <h2>🔒 System Locked</h2>
-      <input type="password" id="passInput" placeholder="Enter Access Code">
-      <button onclick="checkPassword()">UNLOCK</button>
+      <h2>🔒 সিস্টেম লক করা আছে</h2>
+      <input type="password" id="passInput" placeholder="পাসওয়ার্ড দিন">
+      <button onclick="checkPassword()">আনলক করুন</button>
     </div>
   </div>
 
   <div class="container">
     <div class="header">
-      <h2 class="title">📊 AI Candlestick Analyzer</h2>
-      <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+      <h2 class="title">📊 AI ক্যান্ডেলস্টিক চার্ট এনালাইজার</h2>
+      <button class="settings-btn" onclick="openSettings()">⚙️ সেটিং</button>
     </div>
 
     <div class="box">
       <input type="file" id="imageInput" accept="image/*">
       <br>
-      <button class="btn-main" onclick="uploadAndAnalyze()">Analyze Chart</button>
+      <button class="btn-main" onclick="uploadAndAnalyze()">চার্ট বিশ্লেষণ করুন</button>
     </div>
 
     <div id="signalBox"></div>
 
-    <div id="detailsBox">Upload an image and click analyze...</div>
+    <div id="detailsBox">চার্টের ছবি সিলেক্ট করে "চার্ট বিশ্লেষণ করুন" বাটনে ক্লিক করুন...</div>
   </div>
 
   <div id="settingsModal" class="modal">
     <div class="modal-content">
-      <h3>⚙️ API Key Settings</h3>
-      <p style="font-size: 13px; color: #aaa; margin-top: 5px;">Set your custom Gemini API Key.</p>
-      <input type="password" id="customApiKey" placeholder="Paste Gemini API Key">
+      <h3>⚙️ API Key সেটিং</h3>
+      <p style="font-size: 13px; color: #aaa; margin-top: 5px;">আপনার কাস্টম Gemini API Key নিচে দিন:</p>
+      <input type="password" id="customApiKey" placeholder="Gemini API Key পেস্ট করুন">
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button class="settings-btn" onclick="closeSettings()">Cancel</button>
-        <button class="btn-main" onclick="saveSettings()" style="padding: 8px 16px;">Save Key</button>
+        <button class="settings-btn" onclick="closeSettings()">বাতিল</button>
+        <button class="btn-main" onclick="saveSettings()" style="padding: 8px 16px;">সেভ করুন</button>
       </div>
     </div>
   </div>
@@ -245,7 +245,7 @@
       if (pass === 'lawlite50') {
         document.getElementById('lockScreen').style.display = 'none';
       } else {
-        alert('Wrong Password!');
+        alert('ভুল পাসওয়ার্ড!');
       }
     }
 
@@ -262,15 +262,15 @@
       const key = document.getElementById('customApiKey').value.trim();
       if (key) {
         localStorage.setItem('user_gemini_api_key', key);
-        alert('API Key saved!');
+        alert('API Key সেভ হয়েছে!');
       } else {
         localStorage.removeItem('user_gemini_api_key');
-        alert('Default API Key restored.');
+        alert('ডিফল্ট API Key রিস্টোর করা হয়েছে।');
       }
       closeSettings();
     }
 
-    // 3. CHART ANALYSIS & SIGNAL PARSING
+    // 3. CHART ANALYSIS
     async function uploadAndAnalyze() {
       const fileInput = document.getElementById('imageInput');
       const signalBox = document.getElementById('signalBox');
@@ -278,13 +278,13 @@
       const customApiKey = localStorage.getItem('user_gemini_api_key') || '';
 
       if (!fileInput.files[0]) {
-        alert('Please select an image first!');
+        alert('অনুগ্রহ করে একটি ছবি আগে সিলেক্ট করুন!');
         return;
       }
 
       signalBox.style.display = 'none';
       detailsBox.style.display = 'block';
-      detailsBox.innerText = 'Analyzing chart with Gemini AI... Please wait...';
+      detailsBox.innerText = 'Gemini AI চার্ট এনালাইসিস করছে... অনুগ্রহ করে অপেক্ষা করুন...';
 
       const formData = new FormData();
       formData.append('chart', fileInput.files[0]);
@@ -304,18 +304,18 @@
 
         const text = data.analysis;
         
-        // Signal Detection Logic
+        // Signal Parsing
         let signal = 'SKIP';
         let signalClass = 'signal-skip';
 
-        if (text.includes('RECOMMENDATION: UP') || text.includes('PREDICTION: UP')) {
-          signal = '🟢 NEXT CANDLE: UP';
+        if (text.includes('RECOMMENDATION: UP')) {
+          signal = '🟢 পরবর্তী ক্যান্ডেল: UP (BUY)';
           signalClass = 'signal-up';
-        } else if (text.includes('RECOMMENDATION: DOWN') || text.includes('PREDICTION: DOWN')) {
-          signal = '🔴 NEXT CANDLE: DOWN';
+        } else if (text.includes('RECOMMENDATION: DOWN')) {
+          signal = '🔴 পরবর্তী ক্যান্ডেল: DOWN (SELL)';
           signalClass = 'signal-down';
         } else {
-          signal = '🟠 NEXT CANDLE: SKIP / UNCERTAIN';
+          signal = '🟠 পরবর্তী ক্যান্ডেল: SKIP (মার্কেট অনিশ্চিত)';
           signalClass = 'signal-skip';
         }
 
@@ -329,11 +329,11 @@
         detailsBox.innerText = text;
 
       } catch (err) {
-        detailsBox.innerText = 'Error connecting to server.';
+        detailsBox.innerText = 'সার্ভারের সাথে সংযোগ স্থাপন করতে সমস্যা হচ্ছে।';
       }
     }
 
-    // 4. ANIMATED SPACE BACKGROUND (PARTICLES)
+    // 4. ANIMATED BACKGROUND
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
